@@ -10,6 +10,8 @@ import 'element-ui/lib/theme-default/index.css'
 Vue.use(VueResource)
 Vue.use(ElementUI)
 
+Vue.component('editor', require('./components/Editor'))
+
 Vue.config.productionTip = false
 
 /* eslint-disable no-new */

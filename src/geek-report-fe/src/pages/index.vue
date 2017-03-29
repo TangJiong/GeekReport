@@ -1,15 +1,23 @@
 <template>
   <div>
-    <h1>GeekReport - Create Report in more GEEK way!</h1>
-    <el-form label-position="right" label-width="80px" :model="formLabelAlign">
-      <el-form-item label="账号">
-        <el-input v-model="account"></el-input>
-      </el-form-item>
-      <el-form-item label="密码">
-        <el-input v-model="password"></el-input>
-      </el-form-item>
-      <el-button type="primary" @click="doLogin">登录</el-button>
-    </el-form>
+    <h1 class="project title">GeekReport</h1>
+    <h3 class="project subtitle">Create Report in more GEEK way!</h3>
+    <el-row type="flex" justify="center">
+      <el-col :span="8">
+        <el-form label-position="right" label-width="80px" :model="formLabelAlign">
+          <el-form-item label="账号">
+            <el-input v-model="account"></el-input>
+          </el-form-item>
+          <el-form-item label="密码">
+            <el-input v-model="password"></el-input>
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" @click="doLogin">登录</el-button>
+            <el-button type="text">创建账号</el-button>
+          </el-form-item>
+        </el-form>
+      </el-col>
+    </el-row>
   </div>
 </template>
 
@@ -31,5 +39,12 @@ export default {
 </script>
 
 <style scoped>
-
+.project.title {
+  text-align: center;
+  margin: 50px 0 15px 0;
+}
+.project.subtitle {
+  text-align: center;
+  margin: 15px 0 50px 0;
+}
 </style>

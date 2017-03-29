@@ -30,7 +30,21 @@ export default new Router({
             {
               path: ':projectId',
               name: 'project-detail',
-              component: require('@/pages/project/detail')
+              component: require('@/pages/project/detail'),
+              children: [
+                {
+                  path: 'page',
+                  name: 'page',
+                  component: require('@/pages/subject/subject'),
+                  children: [
+                    {
+                      path: ':pageId',
+                      name: 'page-detail',
+                      component: require('@/pages/page/page')
+                    }
+                  ]
+                }
+              ]
             },
             {
               path: ':projectId/setting',

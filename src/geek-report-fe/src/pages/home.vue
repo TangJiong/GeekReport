@@ -1,11 +1,11 @@
 <template>
-  <div>
-    <el-menu theme="dark" :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
+  <div class="app-body">
+    <el-menu theme="dark" :default-active="activeIndex" mode="horizontal" @select="handleSelect">
       <el-menu-item index="1">
         <router-link :to="{name: 'home', params: {username: user.username}}">GeekReport</router-link>
       </el-menu-item>
       <el-menu-item index="2">
-        <router-link :to="{name: 'project', params: {username: user.username}}">我的项目</router-link>
+        <router-link :to="{name: 'project', params: {username: user.username}}">项目</router-link>
       </el-menu-item>
       <el-menu-item index="3">
         <router-link :to="{name: 'profile'}">个人中心</router-link>
@@ -35,3 +35,6 @@ export default {
   }
 }
 </script>
+<style>
+
+</style>
