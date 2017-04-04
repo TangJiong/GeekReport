@@ -1,12 +1,16 @@
 <template>
   <div class="main-container">
     <div class="container-sidebar">
-      <el-menu default-active="1-1">
+      <el-menu default-active="1-1" :router="true">
         <el-submenu index="1">
           <template slot="title"><i class="el-icon-message"></i>主题1</template>
           <el-menu-item-group>
-            <el-menu-item index="1-1">页1</el-menu-item>
-            <el-menu-item index="1-2">页2</el-menu-item>
+            <el-menu-item index="1-1" :route="{name: 'page-detail', params: {pageId: 1}}">
+              炫酷报表1
+            </el-menu-item>
+            <el-menu-item index="1-2" :route="{name: 'page-detail', params: {pageId: 2}}">
+              炫酷报表2
+            </el-menu-item>
           </el-menu-item-group>
         </el-submenu>
         <el-submenu index="2">

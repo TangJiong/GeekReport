@@ -1,17 +1,17 @@
 <template>
   <div class="app-body">
-    <el-menu theme="dark" :default-active="activeIndex" mode="horizontal" @select="handleSelect">
-      <el-menu-item index="1">
-        <router-link :to="{name: 'home', params: {username: user.username}}">GeekReport</router-link>
+    <el-menu theme="dark" :router="true" :default-active="activeIndex" mode="horizontal" @select="handleSelect">
+      <el-menu-item index="1" :route="{name: 'home', params: {username: user.username}}">
+        GeekReport
       </el-menu-item>
-      <el-menu-item index="2">
-        <router-link :to="{name: 'project', params: {username: user.username}}">项目</router-link>
+      <el-menu-item index="2" :route="{name: 'project', params: {username: user.username}}">
+        项目
       </el-menu-item>
-      <el-menu-item index="3">
-        <router-link :to="{name: 'profile'}">个人中心</router-link>
+      <el-menu-item index="3" :route="{name: 'profile'}">
+        个人中心
       </el-menu-item>
-      <el-menu-item index="4">
-        <router-link :to="{name: 'setting'}">系统设置</router-link>
+      <el-menu-item index="4" :route="{name: 'setting'}">
+        系统设置
       </el-menu-item>
     </el-menu>
     <router-view></router-view>

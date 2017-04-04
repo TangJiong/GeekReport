@@ -4,6 +4,42 @@
       <div class="paragraph-title">
         段落标题
       </div>
+      <div class="output-container">
+        <div class="output-container-title">输出结果</div>
+        <div class="output-wrapper">
+          <el-tabs v-model="activeName" @tab-click="handleClick">
+            <el-tab-pane label="表格" name="first">
+              <el-table
+                :data="tableData"
+                height="300"
+                border
+                style="width: 100%">
+                <el-table-column
+                  prop="date"
+                  label="日期"
+                  width="180">
+                </el-table-column>
+                <el-table-column
+                  prop="name"
+                  label="姓名"
+                  width="180">
+                </el-table-column>
+                <el-table-column
+                  prop="address"
+                  label="地址">
+                </el-table-column>
+              </el-table>
+            </el-tab-pane>
+            <el-tab-pane label="Charts" name="second">chart's</el-tab-pane>
+            <el-tab-pane label="更多" name="third">自定义可视化</el-tab-pane>
+          </el-tabs>
+        </div>
+      </div>
+    </div>
+    <div class="paragraph-container">
+      <div class="paragraph-title">
+        段落标题
+      </div>
       <div class="input-container">
         <div class="schema-container">
           <div class="container-menu">
@@ -80,26 +116,32 @@
       <div class="output-container">
         <div class="output-container-title">输出结果</div>
         <div class="output-wrapper">
-          <el-table
-            :data="tableData"
-            height="250"
-            border
-            style="width: 100%">
-            <el-table-column
-              prop="date"
-              label="日期"
-              width="180">
-            </el-table-column>
-            <el-table-column
-              prop="name"
-              label="姓名"
-              width="180">
-            </el-table-column>
-            <el-table-column
-              prop="address"
-              label="地址">
-            </el-table-column>
-          </el-table>
+          <el-tabs v-model="activeName" @tab-click="handleClick">
+            <el-tab-pane label="表格" name="first">
+              <el-table
+                :data="tableData"
+                height="300"
+                border
+                style="width: 100%">
+                <el-table-column
+                  prop="date"
+                  label="日期"
+                  width="180">
+                </el-table-column>
+                <el-table-column
+                  prop="name"
+                  label="姓名"
+                  width="180">
+                </el-table-column>
+                <el-table-column
+                  prop="address"
+                  label="地址">
+                </el-table-column>
+              </el-table>
+            </el-tab-pane>
+            <el-tab-pane label="Charts" name="second">chart's</el-tab-pane>
+            <el-tab-pane label="更多" name="third">自定义可视化</el-tab-pane>
+          </el-tabs>
         </div>
       </div>
     </div>
@@ -181,13 +223,18 @@ export default {
           name: '王小虎',
           address: '上海市普陀区金沙江路 1518 弄'
         }
-      ]
+      ],
+      activeName: 'first'
     }
   },
 
   methods: {
     handleChange () {
       console.log(this.activeNames)
+    },
+
+    handleClick (tab, event) {
+      console.log(tab, event)
     }
   }
 }
@@ -196,6 +243,7 @@ export default {
 <style>
 .paragraph-container {
   border: 1px solid #dfe6ec;
+  margin-bottom: 40px;
 }
 .paragraph-title {
   padding: 5px;

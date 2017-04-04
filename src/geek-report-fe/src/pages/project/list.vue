@@ -44,7 +44,7 @@
         <div class="card-wrapper">
           <el-card v-for="(o, index) in 8" :key="index" class="project-card" :body-style="{padding: '0px'}">
             <div class="project-wrapper">
-              <img class="project-image" src="https://dummyimage.com/400x400/58b7ff/ffffff.png&text=image">
+              <img class="project-image" :src="'static/charts' + ((index+1) % 3 + 1) + '.png'">
               <div class="project-description">
                 <div class="title">项目名称</div>
                 <div class="extra">{{ currentDate }}</div>
