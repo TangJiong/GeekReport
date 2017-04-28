@@ -28,6 +28,11 @@ export default new Router({
               component: require('@/pages/project/list')
             },
             {
+              path: 'new',
+              name: 'project-new',
+              component: require('@/pages/project/form')
+            },
+            {
               path: ':projectId',
               name: 'project-detail',
               component: require('@/pages/project/detail'),
@@ -50,6 +55,11 @@ export default new Router({
               path: ':projectId/setting',
               name: 'project-setting',
               component: require('@/pages/project/setting')
+            },
+            {
+              path: ':projectId/edit',
+              name: 'project-edit',
+              component: require('@/pages/project/form')
             }
           ]
         },

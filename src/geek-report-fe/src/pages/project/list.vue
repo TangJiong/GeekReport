@@ -19,7 +19,7 @@
       <div class="small-padding-container">
         <el-row type="flex" justify="space-between">
           <el-col :span="4">
-            <el-button type="primary"><i class="fa fa-plus" aria-hidden="true"></i> 创建项目</el-button>
+            <el-button type="primary" @click="newProject"><i class="fa fa-plus" aria-hidden="true"></i> 创建项目</el-button>
           </el-col>
           <el-col :span="10">
             <el-row type="flex" justify="space-around">
@@ -54,7 +54,7 @@
               <router-link class="menu-item" :to="{name: 'project-detail', params: {projectId: index}}">
                 <i class="fa fa-eye" aria-hidden="true"></i>
               </router-link>
-              <router-link class="menu-item" :to="{name: 'project-detail', params: {projectId: index}}">
+              <router-link class="menu-item" :to="{name: 'project-edit', params: {projectId: index}}">
                 <i class="fa fa-pencil" aria-hidden="true"></i>
               </router-link>
               <router-link class="menu-item" :to="{name: 'project-setting', params: {projectId: index}}">
@@ -82,6 +82,10 @@ export default {
   methods: {
     doSearch () {
       console.log('searching project...')
+    },
+
+    newProject () {
+      this.$router.push({name: 'project-new'})
     }
   }
 }
