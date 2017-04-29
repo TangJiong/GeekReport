@@ -1,1 +1,0 @@
-web: java $JVM_OPTS -cp target/uberjar/geek-report.jar clojure.main -m geek-report.core
