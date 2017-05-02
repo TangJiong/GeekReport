@@ -40,7 +40,7 @@ html,body {
 }
 
 .container-body {
-  flex: 0 0 calc(100% - 180px);
+  flex: 1 1 auto;
   height: 100%;
   overflow: auto;
 }
