@@ -9,10 +9,10 @@
             PreparedStatement]))
 
 (defstate ^:dynamic *db*
-           :start (conman/connect! {:jdbc-url (env :database-url)})
-           :stop (conman/disconnect! *db*))
+          :start (conman/connect! {:jdbc-url (env :database-url)})
+          :stop (conman/disconnect! *db*))
 
-(conman/bind-connection *db* "sql/queries.sql")
+(conman/bind-connection *db* "sql/core.sql")
 
 (defn to-date [^java.sql.Date sql-date]
   (-> sql-date (.getTime) (java.util.Date.)))

@@ -2,7 +2,7 @@
   (:require [compojure.core :refer [routes wrap-routes]]
             [geek-report.layout :refer [error-page]]
             [geek-report.routes.home :refer [home-routes]]
-            [geek-report.routes.services :refer [service-routes]]
+            [geek-report.routes.apis :refer [api-routes]]
             [compojure.route :as route]
             [geek-report.env :refer [defaults]]
             [mount.core :as mount]
@@ -17,7 +17,7 @@
     (-> #'home-routes
         (wrap-routes middleware/wrap-csrf)
         (wrap-routes middleware/wrap-formats))
-    #'service-routes
+    #'api-routes
     (route/not-found
       (:body
         (error-page {:status 404

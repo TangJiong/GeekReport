@@ -8,5 +8,5 @@
   (layout/render "index.html"))
 
 (defroutes home-routes
-  (GET "/" [] (home-page)))
+           (GET "/" [] (home-page)))
 
