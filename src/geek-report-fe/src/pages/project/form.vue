@@ -36,7 +36,7 @@
                     </el-row>
                     <div class="divider"></div>
                     <el-row style="text-align:center">
-                      <el-button type="primary">更新</el-button>
+                      <el-button type="primary" @click="handleUpdateDatasource(props.row)">更新</el-button>
                     </el-row>
                   </el-form>
                 </template>
@@ -92,7 +92,8 @@
 
           </el-form-item>
           <el-form-item style="text-align:right">
-            <el-button type="primary" @click="handleCreateProject">立即创建</el-button>
+            <el-button v-if="formType === 'EDIT'" type="primary" @click="handleUpdateProject">保存</el-button>
+            <el-button v-else type="primary" @click="handleCreateProject">立即创建</el-button>
             <el-button @click="handleCancel">取消</el-button>
           </el-form-item>
         </el-form>
@@ -123,7 +124,37 @@ export default {
       datasources: []
     }
   },
+
+  computed: {
+    formType () {
+      if (this.$route.params.projectId !== undefined) {
+        return 'EDIT'
+      } else {
+        return 'ADD'
+      }
+    }
+  },
+
+  created () {
+    this.initData()
+  },
+
   methods: {
+    initData () {
+      let vm = this
+      // projectId exists in $route.params => edit
+      // else => add
+      if (this.$route.params.projectId !== undefined) {
+        let projectId = this.$route.params.projectId
+        ProjectService.getById(projectId).then(({data}) => {
+          vm.project = data
+        })
+        DatasourceService.getByProject(projectId).then(({data}) => {
+          vm.datasources = data
+        })
+      }
+    },
+
     go2ProjectList () {
       this.$router.push({name: 'project-list'})
     },
@@ -131,11 +162,25 @@ export default {
     handleCreateDatasource () {
       let datasource = _.cloneDeep(this.datasource)
       this.datasources.push(datasource)
+      this.doCreateDatasource(datasource)
       this.datasource = {
         name: '',
         dbname: '',
         driver_path: '',
         config: ''
+      }
+    },
+
+    handleUpdateDatasource (datasource) {
+      this.doUpdateDatasource(datasource)
+    },
+
+    handleDeleteDatasource (index, row) {
+      this.datasources = this.datasources.filter(datasource => {
+        return !_.isEqual(datasource, row)
+      })
+      if (row.id !== undefined) {
+        this.doDeleteDatasource(row.id)
       }
     },
 
@@ -158,15 +203,51 @@ export default {
       })
     },
 
+    handleUpdateProject () {
+      if (this.$route.params.projectId !== undefined) {
+        let vm = this
+        ProjectService.update({
+          id: this.$route.params.projectId,
+          title: this.project.title
+        }).then(() => {
+          vm.$message.success('更新项目成功！')
+          vm.go2ProjectList()
+        }).catch(({status, statusText}) => {
+          vm.$message.error(status + ' ' + statusText)
+        })
+      }
+    },
+
     handleCancel () {
       this.go2ProjectList()
     },
 
-    handleDeleteDatasource (index, row) {
-      this.datasources = this.datasources.filter(datasource => {
-        return !_.isEqual(datasource, row)
-      })
+    doCreateDatasource (datasource) {
+      if (this.$route.params.projectId !== undefined) {
+        datasource.project_id = this.$route.params.projectId
+        DatasourceService.create(datasource)
+      }
+    },
+
+    doUpdateDatasource (datasource) {
+      if (datasource.id !== undefined) {
+        datasource = _.omit(datasource, ['project_id', 'created_at'])
+        let vm = this
+        DatasourceService.update(datasource).then(() => {
+          vm.$message.success('更新成功！')
+        }).catch(({status, statusText}) => {
+          vm.$message.error(status + ' ' + statusText)
+        })
+      }
+    },
+
+    doDeleteDatasource (id) {
+      DatasourceService.delete(id)
     }
+  },
+
+  watch: {
+    '$route': 'initData'
   }
 }
 </script>

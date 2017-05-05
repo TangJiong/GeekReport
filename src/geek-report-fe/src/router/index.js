@@ -33,33 +33,27 @@ export default new Router({
               component: require('@/pages/project/form')
             },
             {
+              path: ':projectId/setting',
+              name: 'project-setting',
+              component: require('@/pages/project/form')
+            },
+            {
               path: ':projectId',
               name: 'project-detail',
               component: require('@/pages/project/detail'),
+              redirect: {name: 'project-view'},
               children: [
                 {
-                  path: 'page',
-                  name: 'page',
-                  component: require('@/pages/subject/subject'),
-                  children: [
-                    {
-                      path: ':pageId',
-                      name: 'page-detail',
-                      component: require('@/pages/page/page')
-                    }
-                  ]
+                  path: 'view',
+                  name: 'project-view',
+                  component: require('@/pages/page/page')
+                },
+                {
+                  path: 'edit',
+                  name: 'project-edit',
+                  component: require('@/pages/page/page')
                 }
               ]
-            },
-            {
-              path: ':projectId/setting',
-              name: 'project-setting',
-              component: require('@/pages/project/setting')
-            },
-            {
-              path: ':projectId/edit',
-              name: 'project-edit',
-              component: require('@/pages/project/form')
             }
           ]
         },

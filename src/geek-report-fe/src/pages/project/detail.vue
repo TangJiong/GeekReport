@@ -1,6 +1,6 @@
 <template>
   <div class="main-container">
-    <div class="container-sidebar">
+    <!-- <div class="container-sidebar">
       <el-menu default-active="1-1" :router="true">
         <el-submenu index="1">
           <template slot="title"><i class="el-icon-message"></i>主题1</template>
@@ -28,31 +28,57 @@
           </el-menu-item-group>
         </el-submenu>
       </el-menu>
-    </div>
+    </div> -->
     <div class="container-body">
-      <el-breadcrumb style="margin: 10px;" separator="/">
-        <el-breadcrumb-item :to="{ name: 'project' }">项目</el-breadcrumb-item>
-        <el-breadcrumb-item :to="{ name: 'project' }">主题1</el-breadcrumb-item>
-        <el-breadcrumb-item :to="{ name: 'project' }">报表1</el-breadcrumb-item>
-      </el-breadcrumb>
+      <div class="project-title">{{ project.title }}</div>
+      <div class="divider"></div>
       <router-view></router-view>
     </div>
   </div>
 </template>
 
 <script>
+import {
+  ProjectService
+} from '@/services'
+
 export default {
   data () {
-    return {}
+    return {
+      project: {
+        id: '',
+        title: ''
+      }
+    }
+  },
+
+  created () {
+    this.init()
+  },
+
+  methods: {
+    init () {
+      this.initProject()
+    },
+
+    initProject () {
+      let projectId = this.$route.params.projectId
+      let vm = this
+      ProjectService.getById(projectId).then(({data}) => {
+        vm.project = data
+      })
+    }
+  },
+
+  watch: {
+    '$route': 'init'
   }
 }
 </script>
 
-<style>
-.small-margin {
-  margin: 5px;
-}
-.breadcrumb-container {
-  padding: 5px;
+<style scoped>
+.project-title {
+  font-size: 24px;
+  margin: 10px 5px;
 }
 <style>
