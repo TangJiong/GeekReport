@@ -13,6 +13,8 @@
     "lint": "eslint --ext .js,.vue src test/unit/specs test/e2e/specs"
   },
   "dependencies": {
+    "chart.js": "^2.5.0",
+    "d3": "^4.8.0",
     "element-ui": "^1.2.5",
     "lodash": "^4.17.4",
     "moment": "^2.18.1",

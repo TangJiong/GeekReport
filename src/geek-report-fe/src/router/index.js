@@ -52,6 +52,11 @@ export default new Router({
                   path: 'edit',
                   name: 'project-edit',
                   component: require('@/pages/page/page')
+                },
+                {
+                  path: 'paragraph/:pId/edit',
+                  name: 'paragraph-edit',
+                  component: require('@/pages/paragraph/edit')
                 }
               ]
             }

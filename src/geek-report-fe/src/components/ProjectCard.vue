@@ -34,7 +34,7 @@ export default {
   }
 }
 </script>
-<style>
+<style scoped>
 .project-card {
   flex: 0 0 auto;
   width: 180px;
