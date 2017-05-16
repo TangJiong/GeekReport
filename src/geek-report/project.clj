@@ -21,15 +21,14 @@
                  [org.clojure/clojure "1.8.0"]
                  [org.clojure/tools.cli "0.3.5"]
                  [org.clojure/tools.logging "0.3.1"]
-                 [org.webjars.bower/tether "1.4.0"]
-                 [org.webjars/bootstrap "4.0.0-alpha.5"]
-                 [org.webjars/font-awesome "4.7.0"]
-                 [org.webjars/jquery "3.1.1"]
-                 [org.webjars/webjars-locator-jboss-vfs "0.1.0"]
+                 [org.clojure/java.jdbc "0.6.1"]
+                 [org.postgresql/postgresql "42.1.1"]
+                 [com.h2database/h2 "1.4.194"]
                  [ring-webjars "0.1.1"]
                  [ring/ring-core "1.6.0-RC3"]
                  [ring/ring-defaults "0.2.3"]
-                 [selmer "1.10.7"]]
+                 [selmer "1.10.7"]
+                 [cheshire "5.7.1"]]
 
   :min-lein-version "2.0.0"
 

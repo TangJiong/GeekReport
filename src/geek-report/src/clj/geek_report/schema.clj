@@ -21,3 +21,14 @@
                       (s/optional-key :created_at) s/Any})
 
 (s/defschema ProjectList [Project])
+
+(s/defschema Paragraph {(s/optional-key :id)         Long
+                        :title                       String
+                        (s/optional-key :project_id) Long
+                        :width                       Long
+                        :height                      Long
+                        :index                       Long
+                        :default_visual_id           Long
+                        (s/optional-key :created_at) s/Any})
+
+(s/defschema ParagraphList [Paragraph])

@@ -37,6 +37,7 @@ VALUES (:title, :created_by, :created_at)
 -- :doc get projects of a user
 SELECT * FROM project
 WHERE created_by = :user_id
+ORDER BY created_at DESC
 
 -- :name get-project-by-id :? :1
 -- :doc get project
@@ -53,3 +54,37 @@ WHERE id = :id
 -- :doc delete project
 DELETE FROM project
 WHERE id = :id
+
+
+-- :name create-paragraph! :i! :n
+-- :doc create a new paragraph record
+INSERT INTO paragraph
+(title, project_id, width, height, `index`, default_visual_id, created_at)
+VALUES (:title, :project_id, :width, :height, :index, :default_visual_id, :created_at)
+
+-- :name get-paragraph-by-project :? :*
+-- :doc get paragraph of a project order by index asc
+SELECT * FROM paragraph
+WHERE project_id = :project_id
+ORDER BY `index`
+
+-- :name get-paragraph-by-id :? :1
+-- :doc get paragraph detail
+SELECT * FROM paragraph
+WHERE id = :id
+
+-- :name update-paragraph! :! :n
+-- :doc update paragraph
+UPDATE paragraph
+SET title = :title, width = :width, height = :height, `index` = :index, default_visual_id = :default_visual_id
+WHERE id = :id
+
+-- :name delete-paragraph! :! :n
+-- :doc delete paragraph
+DELETE FROM paragraph
+WHERE id = :id
+
+-- :name get-max-index-in-project :? :1
+-- :doc get max index of paragraph in a project
+SELECT MAX(`index`) AS max_index FROM paragraph
+WHERE project_id = :project_id

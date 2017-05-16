@@ -5,9 +5,14 @@
             [compojure.api.meta :refer [restructure-param]]
             [buddy.auth.accessrules :refer [restrict]]
             [buddy.auth :refer [authenticated?]]
-            [geek-report.services.core :as service]
+            [geek-report.services
+             [project :as project-service]
+             [datasource :as datasource-service]
+             [paragraph :as paragraph-service]
+             [query :as query-service]]
             [geek-report.schema :as schema])
-  (:import (java.sql Timestamp)))
+  (:import (java.sql Timestamp)
+           (java.util Map)))
 
 (defn access-error [_ _]
   (unauthorized {:error "unauthorized"}))
@@ -40,6 +45,7 @@
   (context "/api" []
     :tags ["services"]
 
+    ;;; ========================================================================
     (context "/datasource" []
       :tags ["datasource"]
       (POST "/" []
@@ -50,25 +56,25 @@
                       config :- String
                       project_id :- Long]
         :summary "新建数据源"
-        (service/create-datasource! {:name        name
-                                     :dbname      dbname
-                                     :driver_path driver_path
-                                     :config      config
-                                     :project_id  project_id}))
+        (datasource-service/create-datasource! {:name        name
+                                                :dbname      dbname
+                                                :driver_path driver_path
+                                                :config      config
+                                                :project_id  project_id}))
       (GET "/" []
         :return {:status  Long
                  :message String
                  :data    schema/DatasourceList}
         :query-params [project_id :- Long]
         :summary "获取项目下的数据源"
-        (service/get-datasources project_id))
+        (datasource-service/get-datasources project_id))
       (GET "/:id" req
         :return {:status  Long
                  :message String
                  :data    schema/Datasource}
         :path-params [id :- Long]
         :summary "获取数据源"
-        (service/get-datasource id))
+        (datasource-service/get-datasource id))
       (PATCH "/" req
         :return schema/ReturnModel
         :body-params [id :- Long
@@ -77,46 +83,107 @@
                       driver_path :- String
                       config :- String]
         :summary "更新数据源"
-        (service/update-datasource! {:id          id
-                                     :name        name
-                                     :dbname      dbname
-                                     :driver_path driver_path
-                                     :config      config}))
+        (datasource-service/update-datasource! {:id          id
+                                                :name        name
+                                                :dbname      dbname
+                                                :driver_path driver_path
+                                                :config      config}))
       (DELETE "/:id" req
         :return schema/ReturnModel
         :path-params [id :- Long]
         :summary "更新数据源"
-        (service/delete-datasource! id)))
+        (datasource-service/delete-datasource! id)))
 
+    ;;; ========================================================================
     (context "/project" []
       :tags ["project"]
       (POST "/" []
         :return schema/ReturnModel
         :body-params [title :- String, created_by :- Long]
         :summary "新建项目"
-        (service/create-project! {:title title :created_by created_by}))
+        (project-service/create-project! {:title title :created_by created_by}))
       (GET "/" []
         :return {:status  Long
                  :message String
                  :data    schema/ProjectList}
         :query-params [user_id :- Long]
         :summary "获取用户的所有项目"
-        (service/get-projects user_id))
+        (project-service/get-projects user_id))
       (GET "/:id" []
         :return {:status  Long
                  :message String
                  :data    schema/Project}
         :path-params [id :- Long]
         :summary "项目详情"
-        (service/get-project id))
+        (project-service/get-project id))
       (PATCH "/" []
         :return schema/ReturnModel
-        :body-params [title :- String]
+        :body-params [id :- Long
+                      title :- String]
         :summary "修改项目"
-        (service/update-project! {:title title}))
+        (project-service/update-project! {:id    id
+                                          :title title}))
       (DELETE "/:id" []
         :return schema/ReturnModel
         :path-params [id :- Long]
         :summary "删除项目"
-        (service/delete-project! id)))
+        (project-service/delete-project! id)))
+
+    ;;; ========================================================================
+    (context "/query" []
+      :tags ["query"]
+      (POST "/" []
+        :return s/Any
+        :body-params [datasource_id :- Long
+                      project_id :- Long
+                      query_text :- String]
+        :summary "执行查询"
+        (query-service/run-query {:datasource-id datasource_id
+                                  :project-id    project_id
+                                  :query-text    query_text})))
+
+    ;;; ========================================================================
+    (context "/paragraph" []
+      :tags ["paragraph"]
+      (POST "/" []
+        :return schema/ReturnModel
+        :body-params [title :- String,
+                      project_id :- Long]
+        :summary "新建段落"
+        (paragraph-service/create-paragraph! {:title      title
+                                              :project-id project_id}))
+      (GET "/" []
+        :return {:status  Long
+                 :message String
+                 :data    schema/ParagraphList}
+        :query-params [project_id :- Long]
+        :summary "获取一个项目的所有段落"
+        (paragraph-service/get-paragraphs project_id))
+      (GET "/:id" []
+        :return {:status  Long
+                 :message String
+                 :data    schema/Paragraph}
+        :path-params [id :- Long]
+        :summary "段落详情"
+        (paragraph-service/get-paragraph id))
+      (PATCH "/" []
+        :return schema/ReturnModel
+        :body-params [id :- Long
+                      title :- String,
+                      width :- Long,
+                      height :- Long,
+                      index :- Long,
+                      default_visual_id :- Long]
+        :summary "修改项目"
+        (paragraph-service/update-paragraph! {:id                id
+                                              :title             title
+                                              :width             width
+                                              :height            height
+                                              :index             index
+                                              :default_visual_id default_visual_id}))
+      (DELETE "/:id" []
+        :return schema/ReturnModel
+        :path-params [id :- Long]
+        :summary "删除段落"
+        (paragraph-service/delete-paragraph! id)))
     ))
