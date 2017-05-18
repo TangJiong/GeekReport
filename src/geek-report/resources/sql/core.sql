@@ -88,3 +88,31 @@ WHERE id = :id
 -- :doc get max index of paragraph in a project
 SELECT MAX(`index`) AS max_index FROM paragraph
 WHERE project_id = :project_id
+
+
+-- :name create-query! :i! :n
+-- :doc create a new query record
+INSERT INTO query
+(paragraph_id, datasource_id, lang, raw, max_age, created_at)
+VALUES (:paragraph_id, :datasource_id, :lang, :raw, :max_age, :created_at)
+
+-- :name get-query-by-paragraph :? :1
+-- :doc get query of a paragraph
+SELECT * FROM query
+WHERE paragraph_id = :paragraph_id
+
+-- :name get-query-by-id :? :1
+-- :doc get query detail
+SELECT * FROM query
+WHERE id = :id
+
+-- :name update-query! :! :n
+-- :doc update query
+UPDATE query
+SET lang = :lang, raw = :raw, max_age = :max_age
+WHERE id = :id
+
+-- :name delete-query! :! :n
+-- :doc delete query
+DELETE FROM query
+WHERE id = :id

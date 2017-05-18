@@ -132,15 +132,42 @@
     ;;; ========================================================================
     (context "/query" []
       :tags ["query"]
-      (POST "/" []
+      (POST "/run" []
         :return s/Any
-        :body-params [datasource_id :- Long
-                      project_id :- Long
-                      query_text :- String]
+        :body-params [paragraph_id :- Long
+                      datasource_id :- Long
+                      lang :- String
+                      raw :- String]
         :summary "执行查询"
         (query-service/run-query {:datasource-id datasource_id
-                                  :project-id    project_id
-                                  :query-text    query_text})))
+                                  :query-text    raw}))
+      (POST "/save" []
+        :return schema/ReturnModel
+        :body-params [id :- Long                            ;;; -1 for new query
+                      paragraph_id :- Long
+                      datasource_id :- Long
+                      lang :- String
+                      raw :- String
+                      max_age :- Long]
+        :summary "执行查询"
+        (query-service/save-query! {:id            id
+                                   :paragraph_id  paragraph_id
+                                   :datasource_id datasource_id
+                                   :lang          lang
+                                   :raw           raw
+                                   :max_age       max_age}))
+      (GET "/" []
+        :return {:status  Long
+                 :message String
+                 :data    s/Any}
+        :query-params [paragraph_id :- Long]
+        :summary "获取段落对应的查询"
+        (query-service/get-query-by-paragraph paragraph_id))
+      (DELETE "/:id" []
+        :return schema/ReturnModel
+        :path-params [id :- Long]
+        :summary "删除查询"
+        (query-service/delete-query! id)))
 
     ;;; ========================================================================
     (context "/paragraph" []
