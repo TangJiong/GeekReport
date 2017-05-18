@@ -1,6 +1,6 @@
 <template>
   <div class="visual-wrapper">
-    <visual-table v-if="type === 'table'"></visual-table>
+    <visual-table v-if="type === -1"></visual-table>
     <visual-chart v-else :config="chartConfig"></visual-chart>
   </div>
 </template>
@@ -17,8 +17,8 @@ export default {
 
   props: {
     type: {
-      type: String,
-      default: 'table'
+      type: Number,
+      default: -1
     }
   },
 

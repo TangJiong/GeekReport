@@ -2,8 +2,37 @@
   <div class="small-padding-container">
     <div class="paragraph-container">
       <div class="paragraph-title">
-        段落标题
+        {{ paragraph.title }}
+        <el-button type="text" @click="dialogPConfigVisible = true">
+          <i class="fa fa-cog" aria-hidden="true"></i>
+          设置
+        </el-button>
       </div>
+      <el-dialog
+        title="段落设置"
+        :value="dialogPConfigVisible"
+        :close-on-click-modal="false"
+        :close-on-press-escape="false"
+        :show-close="false">
+        <el-form :model="paragraph">
+          <el-form-item label="段落标题" :label-width="formLabelWidth">
+            <el-input v-model="paragraph.title" auto-complete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="段落宽度" :label-width="formLabelWidth">
+            <el-slider
+              v-model="paragraph.width"
+              :step="1"
+              :min="1"
+              :max="24"
+              show-input>
+            </el-slider>
+          </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="dialogPConfigVisible = false">取消</el-button>
+          <el-button type="primary" @click="handleUpdateParagraph">更新</el-button>
+        </div>
+      </el-dialog>
       <div class="input-container">
         <div class="schema-container">
           <div class="container-menu">
@@ -113,9 +142,20 @@
 </template>
 
 <script>
+import {
+  ParagraphService
+} from '@/services'
+import _ from 'lodash'
+
 export default {
   data () {
     return {
+      paragraph: {
+        title: ''
+      },
+      dialogPConfigVisible: false,
+      formLabelWidth: '120px',
+
       activeNames: ['1'],
       options: [
         {
@@ -192,10 +232,41 @@ export default {
     }
   },
 
+  created () {
+    this.init()
+  },
+
   methods: {
+    init () {
+      this.initParagraph()
+    },
+
+    initParagraph () {
+      let paragraphId = this.$route.params.pId
+      let vm = this
+      ParagraphService.getById(paragraphId).then(({data}) => {
+        vm.paragraph = data
+      })
+    },
+
+    handleUpdateParagraph () {
+      let paragraph = _.omit(this.paragraph, ['project_id', 'created_at'])
+      let vm = this
+      ParagraphService.update(paragraph).then(() => {
+        vm.$message.success('更新成功！')
+        vm.dialogPConfigVisible = false
+      }).catch(({status, statusText}) => {
+        vm.$message.error(status + ' ' + statusText)
+      })
+    },
+
     handleTabClick (tab, event) {
       console.log(tab, event)
     }
+  },
+
+  watch: {
+    '$route': 'init'
   }
 }
 </script>
@@ -206,8 +277,9 @@ export default {
   margin-bottom: 40px;
 }
 .paragraph-title {
-  padding: 5px;
+  padding: 10px 5px;
   border-bottom: 1px solid #dfe6ec;
+  font-size: 16px;
 }
 .input-container {
   display: flex;

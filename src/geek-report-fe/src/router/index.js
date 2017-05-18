@@ -46,12 +46,14 @@ export default new Router({
                 {
                   path: 'view',
                   name: 'project-view',
-                  component: require('@/pages/page/page')
+                  component: require('@/pages/page/page'),
+                  props: {type: 'view'}
                 },
                 {
                   path: 'edit',
                   name: 'project-edit',
-                  component: require('@/pages/page/page')
+                  component: require('@/pages/page/page'),
+                  props: {type: 'edit'}
                 },
                 {
                   path: 'paragraph/:pId/edit',

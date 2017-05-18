@@ -51,7 +51,30 @@ var ProjectService = {
   }
 }
 
+var ParagraphService = {
+  create (paragraph) {
+    return Vue.http.post('paragraph', paragraph).then(response => response.data)
+  },
+
+  update (paragraph) {
+    return Vue.http.patch('paragraph', paragraph).then(response => response.data)
+  },
+
+  getByProject (projectId) {
+    return Vue.http.get('paragraph?project_id=' + projectId).then(response => response.data)
+  },
+
+  getById (id) {
+    return Vue.http.get('paragraph/' + id).then(response => response.data)
+  },
+
+  delete (id) {
+    return Vue.http.delete('paragraph/' + id).then(response => response.data)
+  }
+}
+
 export {
   DatasourceService,
-  ProjectService
+  ProjectService,
+  ParagraphService
 }
