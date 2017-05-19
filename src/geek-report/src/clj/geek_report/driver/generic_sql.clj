@@ -28,11 +28,17 @@
   (jdbc/with-db-transaction [transaction-connection connection]
                             (do-with-auto-commit-disabled transaction-connection (partial f transaction-connection))))
 
+(defn- vec-vec->dict-vec
+  [rows columns]
+  (map (fn [row]
+         (zipmap (map #(keyword %) columns) row)) rows))
+
 (defn- run-query
   "Run the query itself."
   [query connection]
-  (let [rows (jdbc/query connection query {:identifiers identity})]
-    {:rows    (or rows [])}))
+  (let [[columns & rows] (jdbc/query connection query {:identifiers identity :as-arrays? true})]
+    {:columns columns
+     :rows    (or (vec-vec->dict-vec rows columns) [])}))
 
 (defn- execute-query
   "Process and run a native (raw SQL) QUERY."
@@ -47,7 +53,7 @@
 
 (defn ISQLDriverDefaultMixins []
   "default implementation of generic sql method"
-  {:can-connect? can-connect?
+  {:can-connect?  can-connect?
    :execute-query execute-query})
 
 

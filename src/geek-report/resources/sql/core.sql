@@ -112,6 +112,12 @@ UPDATE query
 SET lang = :lang, raw = :raw, max_age = :max_age
 WHERE id = :id
 
+-- :name update-query-maxage! :! :n
+-- :doc update query max_age
+UPDATE query
+SET max_age = :max_age
+WHERE id = :id
+
 -- :name delete-query! :! :n
 -- :doc delete query
 DELETE FROM query

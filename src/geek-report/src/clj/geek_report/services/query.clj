@@ -69,3 +69,13 @@
          :message "SUCCESS"})
     (catch Exception e
       (log/error (.getMessage e)))))
+
+(defn set-query-maxage!
+  "设置maxage"
+  [id max-age]
+  (try
+    (db/update-query-maxage! {:id id :max_age max-age})
+    (ok {:status  200
+         :message "SUCCESS"})
+    (catch Exception e
+      (log/error (.getMessage e)))))

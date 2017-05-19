@@ -151,11 +151,17 @@
                       max_age :- Long]
         :summary "执行查询"
         (query-service/save-query! {:id            id
-                                   :paragraph_id  paragraph_id
-                                   :datasource_id datasource_id
-                                   :lang          lang
-                                   :raw           raw
-                                   :max_age       max_age}))
+                                    :paragraph_id  paragraph_id
+                                    :datasource_id datasource_id
+                                    :lang          lang
+                                    :raw           raw
+                                    :max_age       max_age}))
+      (PATCH "/maxage" []
+        :return schema/ReturnModel
+        :body-params [id :- Long
+                      max_age :- Long]
+        :summary "执行查询"
+        (query-service/set-query-maxage! id max_age))
       (GET "/" []
         :return {:status  Long
                  :message String
