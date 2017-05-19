@@ -38,9 +38,9 @@
           <div class="container-menu">
             <div class="container-menu-item">
               <span class="item-label">数据源</span>
-              <el-select class="container-menu-control" v-model="value" placeholder="请选择">
+              <el-select class="container-menu-control" v-model="query.datasource_id" placeholder="请选择">
                 <el-option
-                  v-for="item in options"
+                  v-for="item in datasourceOptions"
                   :label="item.label"
                   :value="item.value"
                   :key="item.value">
@@ -75,7 +75,7 @@
           <div class="container-menu">
             <div class="container-menu-item">
               <span class="item-label">语言</span>
-              <el-select v-model="lang" placeholder="请选择">
+              <el-select v-model="query.lang" placeholder="请选择">
                 <el-option
                   v-for="item in langs"
                   :label="item.label"
@@ -86,54 +86,120 @@
             </div>
             <div class="container-menu-item">
               <el-button-group>
-                <el-button type="primary">
+                <el-button type="primary" @click="handleRunQuery">
                   <i class="fa fa-play" aria-hidden="true"></i> 执行
                 </el-button>
-                <el-button type="default">
+                <!-- <el-button type="default">
                   <i class="fa fa-indent" aria-hidden="true"></i> 格式化
-                </el-button>
-                <el-button type="default">
+                </el-button> -->
+                <el-button type="default" @click="handleSaveQuery">
                   <i class="fa fa-save" aria-hidden="true"></i> 保存
                 </el-button>
-                <el-button type="default">
+                <el-button type="default" @click="handleConfigQuery">
                   <i class="fa fa-cog" aria-hidden="true"></i> 设置
                 </el-button>
               </el-button-group>
             </div>
+            <el-dialog
+              title="查询设置"
+              :value="dialogQConfigVisible"
+              :close-on-click-modal="false"
+              :close-on-press-escape="false"
+              :show-close="false">
+              <el-form :model="query">
+                <el-form-item label="缓存时间(s)" :label-width="formLabelWidth">
+                  <el-input-number v-model="query.max_age"></el-input-number>
+                </el-form-item>
+              </el-form>
+              <div slot="footer" class="dialog-footer">
+                <el-button @click="dialogQConfigVisible = false">取消</el-button>
+                <el-button type="primary" @click="handleUpdateQuery">更新</el-button>
+              </div>
+            </el-dialog>
           </div>
           <editor
-            :mode="lang">
+            :default-value="codeDefault"
+            :mode="query.lang"
+            @code-change="handleCodeChange">
           </editor>
         </div>
       </div>
       <div class="output-container">
-        <div class="output-container-title">输出结果</div>
+        <div class="output-container-title">
+          <el-alert
+            :title="queryStatusText"
+            :type="queryStatus"
+            show-icon>
+          </el-alert>
+        </div>
         <div class="output-wrapper">
           <el-tabs v-model="activeName" @tab-click="handleTabClick">
-            <el-tab-pane label="表格" name="first">
-              <el-table
-                :data="tableData"
-                height="300"
-                border
-                style="width: 100%">
-                <el-table-column
-                  prop="date"
-                  label="日期"
-                  width="180">
-                </el-table-column>
-                <el-table-column
-                  prop="name"
-                  label="姓名"
-                  width="180">
-                </el-table-column>
-                <el-table-column
-                  prop="address"
-                  label="地址">
-                </el-table-column>
-              </el-table>
+            <el-tab-pane label="查询结果" name="first">
+              <visual-table
+                :data="queryResult"></visual-table>
             </el-tab-pane>
-            <el-tab-pane label="Charts" name="second">chart's</el-tab-pane>
-            <el-tab-pane label="更多" name="third">自定义可视化</el-tab-pane>
+            <el-tab-pane label="更多可视化类型" name="third">
+              <div class="visual-container">
+                <div class="visual-config">
+                  <el-form :model="visualization">
+                    <el-form-item label="名称" :label-width="formLabelWidth">
+                      <el-input v-model="visualization.title"></el-input>
+                    </el-form-item>
+                    <el-form-item label="类型" :label-width="formLabelWidth">
+                      <el-select v-model="visualization.chartType" placeholder="请选择">
+                        <el-option
+                          v-for="item in chartTypes"
+                          :label="item.label"
+                          :value="item.value"
+                          :key="item.value">
+                        </el-option>
+                      </el-select>
+                    </el-form-item>
+                    <el-form-item label="Label Column" :label-width="formLabelWidth">
+                      <el-select v-model="visualization.labelColumn" placeholder="请选择">
+                        <el-option
+                          v-for="item in visualColumns"
+                          :label="item.label"
+                          :value="item.value"
+                          :key="item.value">
+                        </el-option>
+                      </el-select>
+                    </el-form-item>
+                    <el-form-item label="X-Axis Column" :label-width="formLabelWidth">
+                      <el-select v-model="visualization.xColumn" placeholder="请选择">
+                        <el-option
+                          v-for="item in visualColumns"
+                          :label="item.label"
+                          :value="item.value"
+                          :key="item.value">
+                        </el-option>
+                      </el-select>
+                    </el-form-item>
+                    <el-form-item label="Y-Axis Column" :label-width="formLabelWidth">
+                      <el-select v-model="visualization.yColumn" placeholder="请选择">
+                        <el-option
+                          v-for="item in visualColumns"
+                          :label="item.label"
+                          :value="item.value"
+                          :key="item.value">
+                        </el-option>
+                      </el-select>
+                    </el-form-item>
+                    <el-form-item :label-width="formLabelWidth">
+                      <el-button type="primary" @click="handleSaveVisualization">保存</el-button>
+                    </el-form-item>
+                  </el-form>
+                </div>
+                <div class="visual-pre">
+                  <visual-table
+                    v-if="visualization.chartType === 'table'"
+                    :data="queryResult"></visual-table>
+                  <visual-chart
+                    v-else
+                    :config="preChartConfig"></visual-chart>
+                </div>
+              </div>
+            </el-tab-pane>
           </el-tabs>
         </div>
       </div>
@@ -143,11 +209,20 @@
 
 <script>
 import {
-  ParagraphService
+  ParagraphService,
+  DatasourceService,
+  QueryService
 } from '@/services'
 import _ from 'lodash'
+import VisualTable from '@/components/VisualTable'
+import VisualChart from '@/components/VisualChart'
 
 export default {
+  components: {
+    VisualTable,
+    VisualChart
+  },
+
   data () {
     return {
       paragraph: {
@@ -155,80 +230,102 @@ export default {
       },
       dialogPConfigVisible: false,
       formLabelWidth: '120px',
-
-      activeNames: ['1'],
-      options: [
-        {
-          value: 'Spark',
-          label: 'Spark'
-        },
-        {
-          value: 'MySQL',
-          label: 'MySQL'
-        },
-        {
-          value: 'MongoDB',
-          label: 'MongoDB'
-        },
-        {
-          value: 'Cassandra',
-          label: 'Cassandra'
-        }
-      ],
-      value: 'MongoDB',
+      datasourceOptions: [],
       langs: [
-        {
-          value: 'scala',
-          label: 'Scala'
-        },
-        {
-          value: 'javascript',
-          label: 'JavaScript'
-        },
         {
           value: 'sql',
           label: 'SQL'
         }
       ],
-      lang: 'javascript',
-      tableData: [
+      query: {
+        paragraph_id: -1,
+        datasource_id: -1,
+        lang: 'sql',
+        raw: '',
+        max_age: 0
+      },
+      codeDefault: '',
+      queryStatus: 'info',
+      queryStatusText: '点击执行按钮，以查看结果',
+      queryResult: {
+        rows: [],
+        columns: []
+      },
+      dialogQConfigVisible: false,
+
+      chartTypes: [
         {
-          date: '2016-05-03',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
+          value: 'table',
+          label: '表格'
         },
         {
-          date: '2016-05-02',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
+          value: 'line',
+          label: '折线图（Line Chart）'
         },
         {
-          date: '2016-05-04',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
+          value: 'bar',
+          label: '柱状图（Bar Chart）'
         },
         {
-          date: '2016-05-01',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
+          value: 'pie',
+          label: '饼图（Pie Chart）'
         },
         {
-          date: '2016-05-08',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
+          value: 'bubble',
+          label: '气泡图（Bubble Chart）'
         },
         {
-          date: '2016-05-06',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
+          value: 'radar',
+          label: '雷达图（Radar Chart）'
         },
         {
-          date: '2016-05-07',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
+          value: 'polarArea',
+          label: 'Polar Area Chart'
         }
       ],
+      visualization: {
+        title: '',
+        chartType: 'table',
+        labelColumn: '',
+        xColumn: '',
+        yColumn: ''
+      },
       activeName: 'first'
+    }
+  },
+
+  computed: {
+    visualColumns () {
+      return this.queryResult.columns.map(column => {
+        return {label: column, value: column}
+      })
+    },
+
+    preChartConfig () {
+      let rawData = _.cloneDeep(this.queryResult.rows)
+      // 1.group by labelColumn
+      let groupedData = _.groupBy(rawData, this.visualization.labelColumn)
+      let datasets = []
+      let labels = []
+      // 2.yColumn -> data
+      _.forOwn(groupedData, (value, key) => {
+        let dataset = {}
+        dataset.label = key
+        dataset.data = value.map(row => row[this.visualization.yColumn])
+        datasets.push(dataset)
+        let _labels = value.map(row => row[this.visualization.xColumn])
+        if (_labels.length > labels.length) {
+          labels = _labels
+        }
+      })
+      return {
+        type: this.visualization.chartType,
+        data: {
+          labels: labels,
+          datasets: datasets
+        },
+        options: {}
+      }
     }
   },
 
@@ -239,6 +336,8 @@ export default {
   methods: {
     init () {
       this.initParagraph()
+      this.fetchDatasourceOptions()
+      this.initQuery()
     },
 
     initParagraph () {
@@ -246,6 +345,33 @@ export default {
       let vm = this
       ParagraphService.getById(paragraphId).then(({data}) => {
         vm.paragraph = data
+      }).catch(({status, statusText}) => {
+        vm.$message.error(status + ' ' + statusText)
+      })
+    },
+
+    fetchDatasourceOptions () {
+      let projectId = this.$route.params.projectId
+      let vm = this
+      DatasourceService.getByProject(projectId).then(({data}) => {
+        vm.datasourceOptions = data.map(item => {
+          return {value: item.id, label: item.name}
+        })
+      }).catch(({status, statusText}) => {
+        vm.$message.error(status + ' ' + statusText)
+      })
+    },
+
+    initQuery () {
+      let paragraphId = this.$route.params.pId
+      let vm = this
+      QueryService.getByParagraph(paragraphId).then(({data}) => {
+        if (data !== null) { // paragraph has saved query
+          vm.query = data
+          vm.codeDefault = data.raw
+        }
+      }).catch(({status, statusText}) => {
+        vm.$message.error(status + ' ' + statusText)
       })
     },
 
@@ -258,6 +384,74 @@ export default {
       }).catch(({status, statusText}) => {
         vm.$message.error(status + ' ' + statusText)
       })
+    },
+
+    handleCodeChange (val) {
+      this.query.raw = val
+    },
+
+    handleRunQuery () {
+      if (this.query.raw !== '') {
+        this.queryStatus = 'info'
+        this.queryStatusText = '查询执行中...'
+        let query = {
+          paragraph_id: parseInt(this.$route.params.pId),
+          datasource_id: this.query.datasource_id,
+          lang: this.query.lang,
+          raw: this.query.raw
+        }
+        QueryService.run(query).then(({data}) => {
+          this.queryStatus = 'success'
+          this.queryStatusText = '查询成功'
+          this.queryResult = data
+        }).catch(({status, statusText, data}) => {
+          this.queryStatus = 'error'
+          this.queryStatusText = status + '' + statusText + '\n' + data.errors
+        })
+      } else {
+        this.queryStatus = 'warning'
+        this.queryStatusText = '请输入查询语句'
+      }
+    },
+
+    handleSaveQuery () {
+      let query = this.query
+      if (query.id !== undefined && query.id !== -1) { // already exists, save to update
+        query = _.omit(query, ['created_at'])
+      } else { // new, save to create
+        query.id = -1
+      }
+      QueryService.save(query).then(({id}) => {
+        if (id !== null) {
+          this.query.id = id
+        }
+        this.$message.success('保存成功')
+      }).catch(({status, statusText}) => {
+        this.query.id = -1
+        this.$message.error(status + '' + statusText)
+      })
+    },
+
+    handleConfigQuery () {
+      this.dialogQConfigVisible = true
+    },
+
+    handleUpdateQuery () {
+      if (this.query.id !== undefined && this.query.id !== -1) {
+        QueryService.setMaxAge({
+          id: this.query.id,
+          max_age: this.query.max_age
+        }).then((resp) => {
+          this.dialogQConfigVisible = false
+          this.$message.success('设置成功')
+        }).catch(({status, statusText}) => {
+          this.$message.error(status + '' + statusText)
+        })
+      }
+    },
+
+    handleSaveVisualization () {
+      // console.log(this.visualization)
     },
 
     handleTabClick (tab, event) {
@@ -346,5 +540,19 @@ export default {
   padding: 5px 0;
   color: #999;
   font-size: 14px;
+}
+.visual-container {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+.visual-config {
+  flex: 0 0 49%;
+  border-right: 1px solid #dfe6ec;
+  padding: 5px;
+}
+.visual-pre {
+  flex: 1 1 auto;
+  padding: 5px;
 }
 </style>

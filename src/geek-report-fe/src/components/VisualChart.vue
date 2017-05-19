@@ -38,8 +38,14 @@ export default {
     },
 
     updateChart () {
+      console.log(this.config)
       if (this.chart !== null) {
-        this.chart.update()
+        this.chart.destroy()
+        var ctx = this.$el.firstChild
+        this.chart = new Chart(ctx, this.config)
+        // this.chart.reset()
+        // this.chart.render(500, false)
+        // this.chart.update(500, false)
       }
     },
 

@@ -73,8 +73,31 @@ var ParagraphService = {
   }
 }
 
+var QueryService = {
+  run (query) {
+    return Vue.http.post('query/run', query).then(response => response.data)
+  },
+
+  save (query) {
+    return Vue.http.post('query/save', query).then(response => response.data)
+  },
+
+  getByParagraph (paraId) {
+    return Vue.http.get('query?paragraph_id=' + paraId).then(response => response.data)
+  },
+
+  delete (id) {
+    return Vue.http.delete('query/' + id).then(response => response.data)
+  },
+
+  setMaxAge (config) {
+    return Vue.http.patch('query/maxage', config).then(response => response.data)
+  }
+}
+
 export {
   DatasourceService,
   ProjectService,
-  ParagraphService
+  ParagraphService,
+  QueryService
 }

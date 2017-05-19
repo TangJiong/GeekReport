@@ -14,6 +14,10 @@ const regMap = {
 }
 export default {
   props: {
+    defaultValue: {
+      type: String,
+      default: ''
+    },
     mode: {
       type: String,
       default: 'json',
@@ -21,13 +25,13 @@ export default {
     },
     theme: {
       type: String,
-      default: 'github',
+      default: 'chrome',
       validator: (val) => themelist.themes.findIndex((theme) => theme.name === val) > -1
     },
     // todo editor split
     fontsize: {
       type: String,
-      default: '12px',
+      default: '13px',
       validator: (val) => parseInt(val) > 11 && parseInt(val) < 25
     },
     codefolding: {
@@ -53,6 +57,9 @@ export default {
     // todo a lot of other things...
   },
   methods: {
+    setValue (val) {
+      editor.setValue(val)
+    },
     setMode () {
       let modeObj = modelist.modesByName[this.mode]
       if (modeObj) {
@@ -68,7 +75,8 @@ export default {
       }
     },
     emitCode () {
-      this.$emit('code-change', editor.getValue())
+      let val = editor.getValue()
+      this.$emit('code-change', val)
     }
   },
   mounted () {
@@ -79,6 +87,9 @@ export default {
     editor.getSession().on('change', this.emitCode)
   },
   watch: {
+    defaultValue (val) {
+      this.setValue(val)
+    },
     mode () {
       this.setMode()
     },
