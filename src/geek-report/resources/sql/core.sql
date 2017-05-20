@@ -122,3 +122,32 @@ WHERE id = :id
 -- :doc delete query
 DELETE FROM query
 WHERE id = :id
+
+
+-- :name create-visualization! :i! :n
+-- :doc create a new visualization record
+INSERT INTO visualization
+(query_id, title, chart_type, group_column, observe_column, measure_column, created_at)
+VALUES (:query_id, :title, :chart_type, :group_column, :observe_column, :measure_column, :created_at)
+
+-- :name get-visualizations-by-query :? :*
+-- :doc get visualization of a query
+SELECT * FROM visualization
+WHERE query_id = :query_id
+
+-- :name get-visualization-by-id :? :1
+-- :doc get visualization
+SELECT * FROM visualization
+WHERE id = :id
+
+-- :name update-visualization! :! :n
+-- :doc update visualization
+UPDATE visualization
+SET title = :title, chart_type = :chart_type, group_column = :group_column,
+ observe_column = :observe_column, measure_column = :measure_column
+WHERE id = :id
+
+-- :name delete-visualization! :! :n
+-- :doc delete visualization
+DELETE FROM visualization
+WHERE id = :id

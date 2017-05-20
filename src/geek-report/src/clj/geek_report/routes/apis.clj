@@ -9,7 +9,8 @@
              [project :as project-service]
              [datasource :as datasource-service]
              [paragraph :as paragraph-service]
-             [query :as query-service]]
+             [query :as query-service]
+             [visualization :as visualization-service]]
             [geek-report.schema :as schema])
   (:import (java.sql Timestamp)
            (java.util Map)))
@@ -219,4 +220,55 @@
         :path-params [id :- Long]
         :summary "删除段落"
         (paragraph-service/delete-paragraph! id)))
+    (context "/visualization" []
+      :tags ["visualization"]
+      (POST "/" []
+        :return schema/ReturnModel
+        :body-params [query_id :- Long
+                      title :- String,
+                      chart_type :- String
+                      group_column :- String
+                      observe_column :- String
+                      measure_column :- String]
+        :summary "新建可视化"
+        (visualization-service/create-visualization! {:query_id       query_id
+                                                      :title          title
+                                                      :chart_type     chart_type
+                                                      :group_column   group_column
+                                                      :observe_column observe_column
+                                                      :measure_column measure_column}))
+      (GET "/" []
+        :return {:status  Long
+                 :message String
+                 :data    s/Any}
+        :query-params [query_id :- Long]
+        :summary "获取一个查询的所有可视化"
+        (visualization-service/get-visualizations query_id))
+      (GET "/:id" []
+        :return {:status  Long
+                 :message String
+                 :data    s/Any}
+        :path-params [id :- Long]
+        :summary "可视化详情"
+        (visualization-service/get-visualization id))
+      (PATCH "/" []
+        :return schema/ReturnModel
+        :body-params [id :- Long
+                      title :- String,
+                      chart_type :- String
+                      group_column :- String
+                      observe_column :- String
+                      measure_column :- String]
+        :summary "修改项目"
+        (visualization-service/update-visualization! {:id             id
+                                                      :title          title
+                                                      :chart_type     chart_type
+                                                      :group_column   group_column
+                                                      :observe_column observe_column
+                                                      :measure_column measure_column}))
+      (DELETE "/:id" []
+        :return schema/ReturnModel
+        :path-params [id :- Long]
+        :summary "删除可视化"
+        (visualization-service/delete-visualization! id)))
     ))
