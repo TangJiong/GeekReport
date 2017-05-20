@@ -5,7 +5,7 @@
         <el-form-item label="标题">
           <el-input v-model="newParagraph.title" placeholder="点此输入标题"></el-input>
         </el-form-item>
-          <el-button type="primary" @click="handleNewParagraph">新建段落</el-button>
+          <el-button type="primary" @click="handleNewParagraph">新建查询段落</el-button>
         </el-form-item>
       </el-form>
     </div>

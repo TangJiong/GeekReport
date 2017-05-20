@@ -2,14 +2,20 @@
   <div class="small-padding-container">
     <div class="paragraph-container">
       <div class="paragraph-title">
-        {{ paragraph.title }}
-        <el-button type="text" @click="dialogPConfigVisible = true">
-          <i class="fa fa-cog" aria-hidden="true"></i>
-          设置
-        </el-button>
+        <span class="title-text">{{ paragraph.title }}</span>
+        <el-button-group>
+          <el-button type="default" @click="handleGoBack">
+            <i class="fa fa-arrow-left" aria-hidden="true"></i>
+            返回
+          </el-button>
+          <el-button type="primary" @click="dialogPConfigVisible = true">
+            <i class="fa fa-upload" aria-hidden="true"></i>
+            保存/发布
+          </el-button>
+        </el-button-group>
       </div>
       <el-dialog
-        title="段落设置"
+        title="段落信息"
         :value="dialogPConfigVisible"
         :close-on-click-modal="false"
         :close-on-press-escape="false"
@@ -27,10 +33,20 @@
               show-input>
             </el-slider>
           </el-form-item>
+          <el-form-item label="默认可视化" :label-width="formLabelWidth">
+            <el-select v-model="paragraph.default_visual_id" placeholder="请选择">
+              <el-option
+                v-for="item in visualizationList"
+                :label="item.title + '-' + item.chart_type"
+                :value="item.id"
+                :key="item.id">
+              </el-option>
+            </el-select>
+          </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
           <el-button @click="dialogPConfigVisible = false">取消</el-button>
-          <el-button type="primary" @click="handleUpdateParagraph">更新</el-button>
+          <el-button type="primary" @click="handleUpdateParagraph">确定发布</el-button>
         </div>
       </el-dialog>
       <div class="input-container">
@@ -128,15 +144,26 @@
         <div class="output-container-title">
           <el-alert
             :title="queryStatusText"
+            :description="queryStatusDetail"
             :type="queryStatus"
+            :closable="false"
             show-icon>
           </el-alert>
         </div>
-        <div class="output-wrapper">
+        <div class="output-wrapper" v-if="queryStatus === 'success'">
           <el-tabs v-model="activeName" @tab-click="handleTabClick">
             <el-tab-pane label="查询结果" name="first">
               <visual-table
                 :data="queryResult"></visual-table>
+            </el-tab-pane>
+            <el-tab-pane
+              v-for="visualItem in visualizationList"
+              :key="visualItem.id"
+              :label="visualItem.title + '-' + visualItem.chart_type"
+              :name="'visual-' + visualItem.id">
+              <visualization
+                :data="queryResult"
+                :config="visualItem"></visualization>
             </el-tab-pane>
             <el-tab-pane label="更多可视化类型" name="third">
               <div class="visual-container">
@@ -146,7 +173,7 @@
                       <el-input v-model="visualization.title"></el-input>
                     </el-form-item>
                     <el-form-item label="类型" :label-width="formLabelWidth">
-                      <el-select v-model="visualization.chartType" placeholder="请选择">
+                      <el-select v-model="visualization.chart_type" placeholder="请选择">
                         <el-option
                           v-for="item in chartTypes"
                           :label="item.label"
@@ -155,8 +182,8 @@
                         </el-option>
                       </el-select>
                     </el-form-item>
-                    <el-form-item label="Label Column" :label-width="formLabelWidth">
-                      <el-select v-model="visualization.labelColumn" placeholder="请选择">
+                    <el-form-item label="分组列" :label-width="formLabelWidth">
+                      <el-select v-model="visualization.group_column" placeholder="请选择">
                         <el-option
                           v-for="item in visualColumns"
                           :label="item.label"
@@ -165,8 +192,8 @@
                         </el-option>
                       </el-select>
                     </el-form-item>
-                    <el-form-item label="X-Axis Column" :label-width="formLabelWidth">
-                      <el-select v-model="visualization.xColumn" placeholder="请选择">
+                    <el-form-item label="自变量列" :label-width="formLabelWidth">
+                      <el-select v-model="visualization.observe_column" placeholder="请选择">
                         <el-option
                           v-for="item in visualColumns"
                           :label="item.label"
@@ -175,8 +202,8 @@
                         </el-option>
                       </el-select>
                     </el-form-item>
-                    <el-form-item label="Y-Axis Column" :label-width="formLabelWidth">
-                      <el-select v-model="visualization.yColumn" placeholder="请选择">
+                    <el-form-item label="因变量列" :label-width="formLabelWidth">
+                      <el-select v-model="visualization.measure_column" placeholder="请选择">
                         <el-option
                           v-for="item in visualColumns"
                           :label="item.label"
@@ -185,18 +212,22 @@
                         </el-option>
                       </el-select>
                     </el-form-item>
+                    <!-- <el-form-item label="设为默认" :label-width="formLabelWidth">
+                      <el-switch
+                        on-text="是"
+                        off-text="否"
+                        @change="handleDefaultVisualChange">
+                      </el-switch>
+                    </el-form-item> -->
                     <el-form-item :label-width="formLabelWidth">
                       <el-button type="primary" @click="handleSaveVisualization">保存</el-button>
                     </el-form-item>
                   </el-form>
                 </div>
                 <div class="visual-pre">
-                  <visual-table
-                    v-if="visualization.chartType === 'table'"
-                    :data="queryResult"></visual-table>
-                  <visual-chart
-                    v-else
-                    :config="preChartConfig"></visual-chart>
+                  <visualization
+                    :data="queryResult"
+                    :config="visualization"></visualization>
                 </div>
               </div>
             </el-tab-pane>
@@ -211,14 +242,17 @@
 import {
   ParagraphService,
   DatasourceService,
-  QueryService
+  QueryService,
+  VisualizationService
 } from '@/services'
 import _ from 'lodash'
+import Visualization from '@/components/Visualization'
 import VisualTable from '@/components/VisualTable'
 import VisualChart from '@/components/VisualChart'
 
 export default {
   components: {
+    Visualization,
     VisualTable,
     VisualChart
   },
@@ -247,6 +281,7 @@ export default {
       codeDefault: '',
       queryStatus: 'info',
       queryStatusText: '点击执行按钮，以查看结果',
+      queryStatusDetail: '',
       queryResult: {
         rows: [],
         columns: []
@@ -283,12 +318,13 @@ export default {
           label: 'Polar Area Chart'
         }
       ],
+      visualizationList: [],
       visualization: {
         title: '',
-        chartType: 'table',
-        labelColumn: '',
-        xColumn: '',
-        yColumn: ''
+        chart_type: 'table',
+        group_column: '',
+        observe_column: '',
+        measure_column: ''
       },
       activeName: 'first'
     }
@@ -302,30 +338,7 @@ export default {
     },
 
     preChartConfig () {
-      let rawData = _.cloneDeep(this.queryResult.rows)
-      // 1.group by labelColumn
-      let groupedData = _.groupBy(rawData, this.visualization.labelColumn)
-      let datasets = []
-      let labels = []
-      // 2.yColumn -> data
-      _.forOwn(groupedData, (value, key) => {
-        let dataset = {}
-        dataset.label = key
-        dataset.data = value.map(row => row[this.visualization.yColumn])
-        datasets.push(dataset)
-        let _labels = value.map(row => row[this.visualization.xColumn])
-        if (_labels.length > labels.length) {
-          labels = _labels
-        }
-      })
-      return {
-        type: this.visualization.chartType,
-        data: {
-          labels: labels,
-          datasets: datasets
-        },
-        options: {}
-      }
+      return VisualizationService.build(this.queryResult.rows, this.visualization)
     }
   },
 
@@ -386,6 +399,10 @@ export default {
       })
     },
 
+    handleGoBack () {
+      this.$router.push({name: 'project-detail', params: {projectId: this.$route.params.projectId}})
+    },
+
     handleCodeChange (val) {
       this.query.raw = val
     },
@@ -406,7 +423,8 @@ export default {
           this.queryResult = data
         }).catch(({status, statusText, data}) => {
           this.queryStatus = 'error'
-          this.queryStatusText = status + '' + statusText + '\n' + data.errors
+          this.queryStatusText = status + '' + statusText
+          this.queryStatusDetail = JSON.stringify(data)
         })
       } else {
         this.queryStatus = 'warning'
@@ -421,6 +439,7 @@ export default {
       } else { // new, save to create
         query.id = -1
       }
+      query.paragraph_id = this.paragraph.id
       QueryService.save(query).then(({id}) => {
         if (id !== null) {
           this.query.id = id
@@ -450,8 +469,29 @@ export default {
       }
     },
 
+    initVisualizationList () {
+      if (this.query.id !== undefined && this.query.id !== -1) {
+        VisualizationService.getByQuery(this.query.id).then(({data}) => {
+          this.visualizationList = data
+        })
+      }
+    },
+
     handleSaveVisualization () {
-      // console.log(this.visualization)
+      if (this.query.id !== undefined && this.query.id !== -1) {
+        let visual = _.cloneDeep(this.visualization)
+        visual.query_id = this.query.id
+        VisualizationService.create(visual).then(({id}) => {
+          this.$message.success('保存成功')
+          this.initVisualizationList()
+        }).catch(({status, statusText}) => {
+          this.$message.error(status + ' ' + statusText)
+        })
+      } else {
+        this.$alert('查询已修改，请先保存查询！', '警告', {
+          confirmButtonText: '确定'
+        })
+      }
     },
 
     handleTabClick (tab, event) {
@@ -460,7 +500,8 @@ export default {
   },
 
   watch: {
-    '$route': 'init'
+    '$route': 'init',
+    'query': 'initVisualizationList'
   }
 }
 </script>
@@ -473,6 +514,11 @@ export default {
 .paragraph-title {
   padding: 10px 5px;
   border-bottom: 1px solid #dfe6ec;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.title-text {
   font-size: 16px;
 }
 .input-container {

@@ -4,6 +4,7 @@
       <h2 class="project-title">
         {{ project.title }}
         <el-switch
+          v-if="showEditSwitch"
           v-model="editable"
           on-text="编辑"
           off-text="只读"
@@ -42,6 +43,12 @@ export default {
     }
   },
 
+  computed: {
+    showEditSwitch () {
+      return this.$route.name === 'project-view' || this.$route.name === 'project-edit'
+    }
+  },
+
   created () {
     this.init()
   },
@@ -49,6 +56,7 @@ export default {
   methods: {
     init () {
       this.initProject()
+      this.setEditable()
     },
 
     initProject () {
@@ -59,11 +67,19 @@ export default {
       })
     },
 
+    setEditable () {
+      if (this.$route.name === 'project-edit') {
+        this.editable = true
+      } else {
+        this.editable = false
+      }
+    },
+
     handleTypeChange (editable) {
       if (editable) {
         this.$router.push({name: 'project-edit', params: {projectId: this.project.id}})
       } else {
-        this.$router.push({name: 'project-view', params: {projectId: this.project.id}})
+        this.$router.push({name: 'project-detail', params: {projectId: this.project.id}})
       }
     }
   },

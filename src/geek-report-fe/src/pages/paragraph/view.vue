@@ -4,16 +4,22 @@
       <div class="paragraph-title">{{ paragraph.title }}</div>
       <div class="paragraph-menu">
         <el-button-group>
-          <el-button size="small"><i class="fa fa-refresh" aria-hidden="true"></i></el-button>
+          <el-button size="small" @click="handleRefresh"><i class="fa fa-refresh" aria-hidden="true"></i></el-button>
           <el-button v-if="editable" size="small" @click="handleEdit"><i class="fa fa-pencil" aria-hidden="true"></i></el-button>
-          <el-button size="small"><i class="fa fa-info" aria-hidden="true"></i></el-button>
+          <el-button size="small" @click="handleMoreInfo"><i class="fa fa-info" aria-hidden="true"></i></el-button>
         </el-button-group>
       </div>
     </div>
     <div class="output-container">
-      <!-- <div class="output-container-title">输出结果</div> -->
       <div class="output-wrapper">
-        <visualization :type="paragraph.default_visual_id"></visualization>
+        <div class="loading"
+          v-if="!ready"
+          v-loading="!ready"
+          element-loading-text="拼命加载中..."></div>
+        <visualization
+          v-if="ready"
+          :data="queryResult"
+          :config="visualizationConfig"></visualization>
       </div>
     </div>
   </div>
@@ -21,6 +27,10 @@
 
 <script>
 import Visualization from '@/components/Visualization'
+import {
+  QueryService,
+  VisualizationService
+} from '@/services'
 
 export default {
   components: {
@@ -49,7 +59,15 @@ export default {
 
   data () {
     return {
-
+      query: {},
+      visualizationConfig: {},
+      queryResult: {
+        columns: [],
+        rows: []
+      },
+      queryReady: false,
+      visualConfigReady: false,
+      queryResultReady: false
     }
   },
 
@@ -61,13 +79,73 @@ export default {
       return {
         flex: '0 0 ' + realWidth + '%'
       }
+    },
+
+    ready () {
+      return this.queryReady && this.visualConfigReady && this.queryResultReady
     }
   },
 
+  created () {
+    this.init()
+  },
+
   methods: {
+    init () {
+      this.fetchQuery()
+      this.fetchVisualizationConfig()
+    },
+
+    handleRefresh () {
+      this.runQuery()
+    },
+
     handleEdit () {
       this.$router.push({name: 'paragraph-edit', params: {pId: this.paragraph.id}})
+    },
+
+    handleMoreInfo () {
+
+    },
+
+    fetchQuery () {
+      QueryService.getByParagraph(this.paragraph.id).then(({data}) => {
+        this.query = data
+        this.queryReady = true
+      })
+    },
+
+    fetchVisualizationConfig () {
+      VisualizationService.getById(this.paragraph.default_visual_id).then(({data}) => {
+        this.visualizationConfig = data
+        this.visualConfigReady = true
+      })
+    },
+
+    runQuery () {
+      this.queryResultReady = false
+      if (this.query !== null &&
+        this.query.id !== undefined &&
+        this.visualizationConfig !== null &&
+        this.visualizationConfig.id !== undefined) {
+        let query = {
+          paragraph_id: this.query.paragraph_id,
+          datasource_id: this.query.datasource_id,
+          lang: this.query.lang,
+          raw: this.query.raw
+        }
+        QueryService.run(query).then(({data}) => {
+          this.queryResult = data
+          this.queryResultReady = true
+        })
+      }
     }
+
+  },
+
+  watch: {
+    'query': 'runQuery',
+    'visualizationConfig': 'runQuery'
   }
 }
 </script>
@@ -95,5 +173,8 @@ export default {
   padding: 5px 0;
   color: #999;
   font-size: 14px;
+}
+.loading {
+  height: 360px;
 }
 </style>

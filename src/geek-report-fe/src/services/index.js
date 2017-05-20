@@ -1,4 +1,6 @@
 import Vue from 'vue'
+import randomColor from 'randomColor'
+import _ from 'lodash'
 
 // function onError (response) {
 //   return {
@@ -95,9 +97,89 @@ var QueryService = {
   }
 }
 
+var VisualizationService = {
+
+  /**
+   * visualization builder
+   * @param  {Array} data   result rows, eg: [{name: 'apple', price: 100}, {name: 'orange', price: 120}]
+   * @param  {Object} config {groupColumn: '', observeColumn: '', measureColumn: ''}
+   * @return {Object} config object for Chart.js
+   */
+  build (data, config) {
+    // 1.group by groupColumn
+    let groupedData = _.groupBy(data, config.group_column)
+    let datasets = []
+    let labels = []
+    // 2.measureColumn -> data
+    _.forOwn(groupedData, (value, key) => {
+      let dataset = {}
+      dataset.fill = true
+      if (config.chart_type === 'pie' || config.chart_type === 'polarArea') {
+        dataset.borderColor = value.map(row => randomColor(
+          {
+            seed: row[config.measure_column],
+            format: 'rgba',
+            alpha: 0.6
+          }))
+      } else {
+        dataset.borderColor = randomColor({seed: key, format: 'rgba'})
+      }
+
+      if (config.chart_type === 'pie' || config.chart_type === 'polarArea') {
+        dataset.backgroundColor = value.map(row => randomColor(
+          {
+            seed: row[config.measure_column],
+            format: 'rgba',
+            alpha: 0.6
+          }))
+      } else {
+        dataset.backgroundColor = randomColor({seed: key, format: 'rgba', alpha: 0.2})
+      }
+      dataset.pointBorderColor = randomColor({seed: key, format: 'rgba'})
+      dataset.pointBackgroundColor = randomColor({seed: key, format: 'rgba', alpha: 0.2})
+      dataset.label = key
+      dataset.data = value.map(row => row[config.measure_column])
+      datasets.push(dataset)
+      let _labels = value.map(row => row[config.observe_column])
+      if (_labels.length > labels.length) {
+        labels = _labels
+      }
+    })
+    return {
+      type: config.chart_type,
+      data: {
+        labels: labels,
+        datasets: datasets
+      },
+      options: {}
+    }
+  },
+
+  create (visualization) {
+    return Vue.http.post('visualization', visualization).then(response => response.data)
+  },
+
+  update (visualization) {
+    return Vue.http.patch('visualization', visualization).then(response => response.data)
+  },
+
+  getByQuery (queryId) {
+    return Vue.http.get('visualization?query_id=' + queryId).then(response => response.data)
+  },
+
+  getById (id) {
+    return Vue.http.get('visualization/' + id).then(response => response.data)
+  },
+
+  delete (id) {
+    return Vue.http.delete('visualization/' + id).then(response => response.data)
+  }
+}
+
 export {
   DatasourceService,
   ProjectService,
   ParagraphService,
-  QueryService
+  QueryService,
+  VisualizationService
 }

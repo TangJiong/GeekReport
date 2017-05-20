@@ -11,33 +11,44 @@
               :data="datasources">
               <el-table-column type="expand">
                 <template scope="props">
-                  <el-form label-position="right">
-                    <el-row :gutter="20">
+                  <el-form :label-width="labelWidth">
+                    <el-form-item label="数据源名称">
+                      <el-input v-model="props.row.name"></el-input>
+                    </el-form-item>
+                    <el-form-item label="数据库名称">
+                      <!-- <el-input v-model="props.row.dbname"></el-input> -->
+                      <el-select v-model="props.row.dbname" placeholder="请选择">
+                        <el-option label="mysql" value="mysql"></el-option>
+                        <el-option label="postgres" value="postgres"></el-option>
+                      </el-select>
+                    </el-form-item>
+                    <!-- <el-form-item label="驱动路径" :label-width="labelWidth">
+                      <el-input v-model="props.row.driver_path"></el-input>
+                    </el-form-item> -->
+                    <el-form-item label="驱动配置">
+                      <el-input v-model="props.row.config"></el-input>
+                    </el-form-item>
+                    <el-form-item>
+                      <el-button type="primary" @click="handleUpdateDatasource(props.row)">更新</el-button>
+                    </el-form-item>
+                    <!-- <el-row :gutter="20">
                       <el-col :span="12">
-                        <el-form-item label="数据源名称">
-                          <el-input v-model="props.row.name"></el-input>
-                        </el-form-item>
+
                       </el-col>
                       <el-col :span="12">
-                        <el-form-item label="数据库名称">
-                          <el-input v-model="props.row.dbname"></el-input>
-                        </el-form-item>
+
                       </el-col>
                       <el-col :span="24">
-                        <el-form-item label="驱动路径">
-                          <el-input v-model="props.row.driver_path"></el-input>
-                        </el-form-item>
+
                       </el-col>
                       <el-col :span="24">
-                        <el-form-item label="驱动配置">
-                          <el-input v-model="props.row.config"></el-input>
-                        </el-form-item>
+
                       </el-col>
-                    </el-row>
-                    <div class="divider"></div>
+                    </el-row> -->
+                    <!-- <div class="divider"></div>
                     <el-row style="text-align:center">
                       <el-button type="primary" @click="handleUpdateDatasource(props.row)">更新</el-button>
-                    </el-row>
+                    </el-row> -->
                   </el-form>
                 </template>
               </el-table-column>
@@ -61,28 +72,36 @@
             </el-table>
             <div class="divider"></div>
             <el-form label-position="left" label-width="120px" :model="datasource">
-              <el-row :gutter="20">
+              <el-form-item label="数据源名称">
+                <el-input v-model="datasource.name"></el-input>
+              </el-form-item>
+              <el-form-item label="数据库名称">
+                <el-select v-model="datasource.dbname" placeholder="请选择">
+                  <el-option label="mysql" value="mysql"></el-option>
+                  <el-option label="postgres" value="postgres"></el-option>
+                </el-select>
+                <!-- <el-input v-model="datasource.dbname"></el-input> -->
+              </el-form-item>
+              <!-- <el-col :span="24">
+                <el-form-item label="驱动路径">
+                  <el-input v-model="datasource.driver_path"></el-input>
+                </el-form-item>
+              </el-col> -->
+              <el-form-item label="驱动配置">
+                <el-input v-model="datasource.config"></el-input>
+              </el-form-item>
+              <!-- <el-row :gutter="20">
                 <el-col :span="12">
-                  <el-form-item label="数据源名称">
-                    <el-input v-model="datasource.name"></el-input>
-                  </el-form-item>
+
                 </el-col>
                 <el-col :span="12">
-                  <el-form-item label="数据库名称">
-                    <el-input v-model="datasource.dbname"></el-input>
-                  </el-form-item>
+
                 </el-col>
+
                 <el-col :span="24">
-                  <el-form-item label="驱动路径">
-                    <el-input v-model="datasource.driver_path"></el-input>
-                  </el-form-item>
+
                 </el-col>
-                <el-col :span="24">
-                  <el-form-item label="驱动配置">
-                    <el-input v-model="datasource.config"></el-input>
-                  </el-form-item>
-                </el-col>
-              </el-row>
+              </el-row> -->
             </el-form>
             <div class="divider"></div>
             <el-row style="text-align:center">
@@ -112,13 +131,14 @@ import {
 export default {
   data () {
     return {
+      labelWidth: '120px',
       project: {
         title: ''
       },
       datasource: {
         name: '',
         dbname: '',
-        driver_path: '',
+        driver_path: 'embedded',
         config: ''
       },
       datasources: []
