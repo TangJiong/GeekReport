@@ -1,2 +1,3 @@
 {:production true
- :port 3000}
+ :port 3000
+ :database-url "mysql://localhost:3306/geek_report?user=root&password=123456&autoReconnect=true&useUnicode=true&characterEncoding=UTF-8"}
