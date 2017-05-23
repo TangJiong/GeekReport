@@ -151,3 +151,31 @@ WHERE id = :id
 -- :doc delete visualization
 DELETE FROM visualization
 WHERE id = :id
+
+
+-- :name create-user! :i! :n
+-- :doc create a new user record
+INSERT INTO user
+(email, name, password)
+VALUES (:email, :name, :password)
+
+-- :name get-user-by-id :? :1
+-- :doc get user
+SELECT * FROM user
+WHERE id = :user_id
+
+-- :name get-user-by-email :? :1
+-- :doc get user
+SELECT * FROM user
+WHERE email = :email
+
+-- :name update-user! :! :n
+-- :doc update user
+UPDATE user
+SET name = :name, password = :password
+WHERE id = :id
+
+-- :name delete-user! :! :n
+-- :doc delete user
+DELETE FROM user
+WHERE id = :id

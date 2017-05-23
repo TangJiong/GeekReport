@@ -10,7 +10,8 @@
              [datasource :as datasource-service]
              [paragraph :as paragraph-service]
              [query :as query-service]
-             [visualization :as visualization-service]]
+             [visualization :as visualization-service]
+             [user :as user-service]]
             [geek-report.schema :as schema])
   (:import (java.sql Timestamp)
            (java.util Map)))
@@ -45,6 +46,22 @@
     (ok {:user user}))
   (context "/api" []
     :tags ["services"]
+
+    (context "/user" []
+      :tags ["user"]
+      (POST "/login" []
+        :return s/Any
+        :body-params [email :- String,
+                      password :- String]
+        :summary "登录"
+        (user-service/login {:email email :password password}))
+      (POST "/register" []
+        :return s/Any
+        :body-params [email :- String,
+                      name :- String
+                      password :- String]
+        :summary "注册"
+        (user-service/create-user! {:name name :email email :password password})))
 
     ;;; ========================================================================
     (context "/datasource" []
