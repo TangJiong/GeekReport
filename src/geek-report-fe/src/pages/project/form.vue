@@ -103,6 +103,7 @@
             <el-button v-if="formType === 'EDIT'" type="primary" @click="handleUpdateProject">保存</el-button>
             <el-button v-else type="primary" @click="handleCreateProject">立即创建</el-button>
             <el-button @click="handleCancel">取消</el-button>
+            <el-button v-if="formType === 'EDIT'" type="danger" @click="handleDeleteProject">删除</el-button>
           </el-form-item>
         </el-form>
       </div>
@@ -223,6 +224,28 @@ export default {
           vm.go2ProjectList()
         }).catch(({status, statusText}) => {
           vm.$message.error(status + ' ' + statusText)
+        })
+      }
+    },
+
+    handleDeleteProject () {
+      this.$confirm('删除操作不可撤销, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.doDeleteProject()
+      }).catch(() => {
+        this.$message('已取消删除')
+      })
+    },
+
+    doDeleteProject () {
+      if (this.project.id !== undefined) {
+        ProjectService.delete(this.project.id).then(({status}) => {
+          this.$message.success('删除成功!')
+        }).catch(({status, statusText, error}) => {
+          this.$message.error(status + ' ' + statusText)
         })
       }
     },

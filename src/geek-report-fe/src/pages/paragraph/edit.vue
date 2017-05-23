@@ -12,6 +12,10 @@
             <i class="fa fa-upload" aria-hidden="true"></i>
             保存/发布
           </el-button>
+          <el-button type="danger" @click="handleDeletePara">
+            <i class="fa fa-trash" aria-hidden="true"></i>
+            删除
+          </el-button>
         </el-button-group>
       </div>
       <el-dialog
@@ -394,6 +398,7 @@ export default {
       ParagraphService.update(paragraph).then(() => {
         vm.$message.success('更新成功！')
         vm.dialogPConfigVisible = false
+        vm.handleGoBack()
       }).catch(({status, statusText}) => {
         vm.$message.error(status + ' ' + statusText)
       })
@@ -401,6 +406,28 @@ export default {
 
     handleGoBack () {
       this.$router.push({name: 'project-detail', params: {projectId: this.$route.params.projectId}})
+    },
+
+    handleDeletePara () {
+      this.$confirm('删除操作不可撤销, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.doDeletePara()
+      }).catch(() => {
+        this.$message.info('已取消删除')
+      })
+    },
+
+    doDeletePara () {
+      if (this.paragraph.id !== undefined) {
+        ParagraphService.delete(this.paragraph.id).then(({status}) => {
+          this.$message.success('删除成功!')
+        }).catch(({status, statusText, error}) => {
+          this.$message.error(status + ' ' + statusText)
+        })
+      }
     },
 
     handleCodeChange (val) {
