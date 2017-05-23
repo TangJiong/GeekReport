@@ -196,8 +196,7 @@ export default {
 
     handleCreateProject () {
       let vm = this
-      // TODO
-      let userId = 1
+      let userId = this.$store.state.user.id
       let project = _.cloneDeep(this.project)
       _.assign(project, {created_by: userId})
       let datasources = _.cloneDeep(this.datasources)

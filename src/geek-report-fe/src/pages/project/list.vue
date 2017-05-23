@@ -70,8 +70,7 @@ export default {
 
   methods: {
     initProjects () {
-      // TODO
-      let userId = 1
+      let userId = this.$store.state.user.id
       this.projects = ProjectService.getByUser(userId).then(({data}) => data)
     },
 

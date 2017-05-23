@@ -9,6 +9,16 @@ import _ from 'lodash'
 //   }
 // }
 
+var UserService = {
+  login (user) {
+    return Vue.http.post('user/login', user).then(response => response.data)
+  },
+
+  register (user) {
+    return Vue.http.post('user/register', user).then(response => response.data)
+  }
+}
+
 var DatasourceService = {
   create (datasource) {
     return Vue.http.post('datasource', datasource).then(response => response.data)
@@ -177,6 +187,7 @@ var VisualizationService = {
 }
 
 export {
+  UserService,
   DatasourceService,
   ProjectService,
   ParagraphService,
